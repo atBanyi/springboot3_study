@@ -13,4 +13,4 @@ spring:
 server:
   port: 9191
   servlet:
-    context-path: /v1/api
+    context-path: /api

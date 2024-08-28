@@ -30,7 +30,7 @@ public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping("/register")
-    public Result register(@Pattern(regexp = "^\\S{5,16}") String name, String nationality, String passport, String phone, String participant, String occasion) {
+    public Result register(@Pattern(regexp = "^\\S{2,6}") String name, String nationality, String passport, String phone, String participant, String occasion) {
         /*查询用户*/
         User user=userService.findByUserName(name);
         if (user==null){
@@ -42,6 +42,22 @@ public class UserController {
             // 占用
             return Result.error("用户名已被占用");
         }
+    }
+    /** 用户登录*/
+    @PostMapping("/login")
+    public Result<String> login(String name,String phone){
+        /*根据用户名查询用户*/
+        User user = userService.findByUserName(name);
+        /*判断用户是否存在*/
+        if (user == null) {
+           return Result.error("不存在该用户");
+        }
+        //
+        /*判断密码是否正确 */
+        if (phone.equals(user.getPhone())) {
+            return Result.success("jwt token");
+        }
+        return Result.error("登录失败");
     }
     @GetMapping("/list")
     public Result findByAllUser(){
