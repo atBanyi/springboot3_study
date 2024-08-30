@@ -14,6 +14,6 @@ public interface UserService{
     User findByUserName(String name);
 
     /* 用户注册*/
-    void register(String name, String nationality, String passport, String phone, String participant, String occasion);
+    void register(User user);
     List<User> findByAllUser();
 }

@@ -1,17 +1,15 @@
 package com.banyi.demo.controller;
-
 import com.banyi.demo.domain.User;
 import com.banyi.demo.result.Result;
 import com.banyi.demo.service.UserService;
+import com.banyi.demo.utils.JwtUtil;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,18 +24,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 @Validated /** 参数校验*/
+@CrossOrigin
 public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping("/register")
-    public Result register(@Pattern(regexp = "^\\S{2,6}") String name, String nationality, String passport, String phone, String participant, String occasion) {
+    public Result register(@RequestBody User user) {
         /*查询用户*/
-        User user=userService.findByUserName(name);
-        if (user==null){
+        User existingUser=userService.findByUserName(user.getName());
+        if (existingUser==null){
             // 没有占用
             // 注册
-            userService.register(name,nationality,passport, phone,participant,occasion);
-            return Result.success();
+            userService.register(user);
+            return Result.success(user);
         }else {
             // 占用
             return Result.error("用户名已被占用");
@@ -55,7 +54,12 @@ public class UserController {
         //
         /*判断密码是否正确 */
         if (phone.equals(user.getPhone())) {
-            return Result.success("jwt token");
+            /*登录成功*/
+            Map<String,Object> claims=new HashMap<>();
+            claims.put("name",user.getName());
+            claims.put("phone",user.getPhone());
+            String token = JwtUtil.generationToken(claims);
+            return Result.success(token);
         }
         return Result.error("登录失败");
     }
@@ -63,5 +67,13 @@ public class UserController {
     public Result findByAllUser(){
         List<User> user=userService.findByAllUser();
        return Result.success(user);
+    }
+    /*查寻用户信息*/
+    @GetMapping("/userInfo")
+    public Result<User> userInfo(@RequestHeader(name = "Authorization") String token){
+        Map<String, Object> map = JwtUtil.parseToken(token);
+        String name = (String) map.get("name");
+        User user = userService.findByUserName(name);
+        return Result.success(user);
     }
 }

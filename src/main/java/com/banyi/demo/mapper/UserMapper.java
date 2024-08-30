@@ -19,7 +19,7 @@ public interface UserMapper {
     User findByUserName(String name);
 
     @Select("insert into user(name,nationality,passport,phone,participant,occasion)" + "values(#{name}, #{nationality}, #{passport}, #{phone}, #{participant}, #{occasion})")
-    void add(String name, String nationality, String passport, String phone, String participant, String occasion);
+    void add(User user);
     @Select("select * from user")
     List<User> findByAllUser();
 }

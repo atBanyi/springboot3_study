@@ -1,5 +1,5 @@
 package com.banyi.demo.domain;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -44,6 +44,9 @@ public class User implements Serializable {
     /**
      * 身份证号/护照号
      */
+    /*
+    @JsonIgnore  // 配置转化为json字符串,获取该链接后,响应数据中忽略这个字段
+    * */
     private String passport;
 
     /**
